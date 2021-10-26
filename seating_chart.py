@@ -1,6 +1,5 @@
 import os
 from PIL import Image, ImageDraw, ImageFont
-from abbrev import abbrev_name
 
 FONT_FILE = os.environ['FONT_FILE'] # a font usable with ImageDraw
 PICTURES_DIR = os.environ['PICTURES_DIR'] # directory with pictures, with subdirectories for grades
@@ -25,10 +24,11 @@ for grade in GRADES:
                 stu_img_fn = f'{grade_pictures_dir}/{student}.jpg'
                 if os.path.exists(stu_img_fn):
                     with Image.open(stu_img_fn) as stu_img:
-                        loc = (coord_pair[0], coord_pair[1] - stu_img.height // 2)
+                        loc = (coord_pair[0] - stu_img.width // 2, coord_pair[1] - stu_img.height // 2)
                         img.paste(stu_img, loc)
                 else:
                     loc = coord_pair
-                draw.text(loc, abbrev_name(student), fill=(255, 255, 255), font=font)
+                text_loc = (loc[0] + 3, loc[1] + 3)
+                draw.text(text_loc, '\n'.join(student.split()), fill=(255, 255, 255), font=font)
 
         img.save(f'seating chart {grade}.jpg')
