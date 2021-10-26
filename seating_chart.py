@@ -1,22 +1,34 @@
+import os
 from PIL import Image, ImageDraw, ImageFont
+from abbrev import abbrev_name
 
-FONT_FILE = '/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+FONT_FILE = os.environ['FONT_FILE'] # a font usable with ImageDraw
+PICTURES_DIR = os.environ['PICTURES_DIR'] # directory with pictures, with subdirectories for grades
+GRADES = 6, 7, 8
 
 with open('station coordinates.txt') as coords_file:
     coord_pairs = [[int(part) for part in line.strip().split()] for line in coords_file.readlines()]
 
-with open('students.txt') as students_file:
-    students = [student.strip() for student in students_file.readlines()]
+for grade in GRADES:
+    students_fn = f'students{grade}.txt'
+    grade_pictures_dir = f'{PICTURES_DIR}/{grade}'
+    with open(students_fn) as students_file:
+        students = [student.strip() for student in students_file.readlines()]
 
-print(coord_pairs, students)
+    font=ImageFont.truetype(FONT_FILE, 24, index=0)
 
-font=ImageFont.truetype(FONT_FILE, 36, index=0)
+    with Image.open('panorama.jpg') as img:
+        draw = ImageDraw.Draw(img)
 
-with Image.open('panorama.jpg') as img:
-    draw = ImageDraw.Draw(img)
+        for coord_pair, student in zip(coord_pairs, students):
+            if student: # student at this seat?
+                stu_img_fn = f'{grade_pictures_dir}/{student}.jpg'
+                if os.path.exists(stu_img_fn):
+                    with Image.open(stu_img_fn) as stu_img:
+                        loc = (coord_pair[0], coord_pair[1] - stu_img.height // 2)
+                        img.paste(stu_img, loc)
+                else:
+                    loc = coord_pair
+                draw.text(loc, abbrev_name(student), fill=(255, 255, 255), font=font)
 
-    for coord_pair, student in zip(coord_pairs, students):
-        draw.text(coord_pair, student, fill=(255, 0, 255), font=font)
-
-    # Save the edited image
-    img.save("seating chart.jpg")
+        img.save(f'seating chart {grade}.jpg')
