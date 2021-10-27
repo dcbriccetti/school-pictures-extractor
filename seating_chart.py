@@ -1,34 +1,52 @@
+'Creates seating chart images containing student photos and names'
+
 import os
 from PIL import Image, ImageDraw, ImageFont
+import numpy as np
+from station import Station
 
-FONT_FILE = os.environ['FONT_FILE'] # a font usable with ImageDraw
-PICTURES_DIR = os.environ['PICTURES_DIR'] # directory with pictures, with subdirectories for grades
+FONT_FILE = os.environ['FONT_FILE']  # a font usable with ImageDraw
+PICTURES_DIR = os.environ['PICTURES_DIR']  # directory with pictures, with subdirectories for grades
 GRADES = 6, 7, 8
+TEXT_MARGIN = 6
 
-with open('station coordinates.txt') as coords_file:
-    coord_pairs = [[int(part) for part in line.strip().split()] for line in coords_file.readlines()]
+def file_lines(filename) -> list[str]:
+    with open(filename) as file:
+        return [line.strip() for line in file.readlines()]
+
+def station_empty(student: str) -> bool: return not student
+
+stations = [Station.from_string(line) for line in file_lines('station coordinates.txt')]
+font = ImageFont.truetype(FONT_FILE, 24)
+text_color = (255, 255, 255)
+
+def draw_text(index: int, student: str, image_pos: np.ndarray, image_width: int):
+    draw.text(tuple(image_pos + TEXT_MARGIN), '\n'.join(student.split()), fill=text_color, font=font)
+
+    station_number_str = str(index + 1)
+    station_number_width: int = draw.textsize(station_number_str, font=font)[0]
+    offset_from_right: int = station_number_width + TEXT_MARGIN
+    station_number_loc: np.ndarray = image_pos + (image_width - offset_from_right, TEXT_MARGIN)
+
+    draw.text(station_number_loc, station_number_str, fill=text_color, font=font)
 
 for grade in GRADES:
-    students_fn = f'students{grade}.txt'
     grade_pictures_dir = f'{PICTURES_DIR}/{grade}'
-    with open(students_fn) as students_file:
-        students = [student.strip() for student in students_file.readlines()]
+    students = file_lines(f'students{grade}.txt')
 
-    font=ImageFont.truetype(FONT_FILE, 24, index=0)
-
-    with Image.open('panorama.jpg') as img:
+    with Image.open('room.jpg') as img:
         draw = ImageDraw.Draw(img)
 
-        for coord_pair, student in zip(coord_pairs, students):
-            if student: # student at this seat?
-                stu_img_fn = f'{grade_pictures_dir}/{student}.jpg'
-                if os.path.exists(stu_img_fn):
-                    with Image.open(stu_img_fn) as stu_img:
-                        loc = (coord_pair[0] - stu_img.width // 2, coord_pair[1] - stu_img.height // 2)
-                        img.paste(stu_img, loc)
-                else:
-                    loc = coord_pair
-                text_loc = (loc[0] + 3, loc[1] + 3)
-                draw.text(text_loc, '\n'.join(student.split()), fill=(255, 255, 255), font=font)
+        for index, (station, student) in enumerate(zip(stations, students)):
+            if station_empty(student): continue
+            student_image_filename = f'{grade_pictures_dir}/{student}.jpg'
+            if not os.path.exists(student_image_filename):
+                print(f'Missing picture for {student}')
+                student_image_filename = f'{PICTURES_DIR}/missing.jpg'
+
+            with Image.open(student_image_filename) as stu_img:
+                image_top_left: np.ndarray = station.loc - (stu_img.width // 2, stu_img.height // 2)
+                img.paste(stu_img, tuple(image_top_left))  # Add the student picture
+                draw_text(index, student, image_top_left, stu_img.width)  # Add the name and station #
 
         img.save(f'seating chart {grade}.jpg')
