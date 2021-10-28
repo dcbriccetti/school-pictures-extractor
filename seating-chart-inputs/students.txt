@@ -1,0 +1,5 @@
+Make one of these files for each grade and name each student<grade>.txt, e.g. student6.txt
+Student name
+Student name
+Student name
+⋮
