@@ -18,19 +18,20 @@ def file_lines(filename) -> list[str]:
 
 def station_empty(student: str) -> bool: return not student
 
-stations = [Station.from_string(line) for line in file_lines(f'{INPUTS_DIR}/station coordinates.txt')]
-font = ImageFont.truetype(FONT_FILE, 24)
-text_color = (255, 255, 255)
-
 def draw_text(index: int, student: str, image_pos: np.ndarray, image_width: int):
+    # Student name
     draw.text(tuple(image_pos + TEXT_MARGIN), '\n'.join(student.split()), fill=text_color, font=font)
 
+    # Station number
     station_number_str = str(index + 1)
     station_number_width: int = draw.textsize(station_number_str, font=font)[0]
     offset_from_right: int = station_number_width + TEXT_MARGIN
     station_number_loc: np.ndarray = image_pos + (image_width - offset_from_right, TEXT_MARGIN)
-
     draw.text(station_number_loc, station_number_str, fill=text_color, font=font)
+
+stations = [Station.from_string(line) for line in file_lines(f'{INPUTS_DIR}/station coordinates.txt')]
+font = ImageFont.truetype(FONT_FILE, 24)
+text_color = (255, 255, 255)
 
 if not os.path.isdir(OUTPUTS_DIR):
     os.mkdir(OUTPUTS_DIR)
