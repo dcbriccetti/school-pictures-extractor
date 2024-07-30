@@ -4,16 +4,16 @@ import os
 from PIL import Image
 import pytesseract
 
-NUM_ROWS = 4
+NUM_ROWS = 5
 NUM_COLS = 7
-TOP_LEFT = 93, 538
-PIC_DIMS = 184, 225
-SLOP = 3  # to avoid the border
-PIC_SPACING = 206, 317
+TOP_LEFT = 100, 553
+PIC_DIMS = 180, 223
+SLOP = 5  # to avoid the border
+PIC_SPACING = 221, 310
 NAME_AREA_HEIGHT = PIC_SPACING[1] - PIC_DIMS[1] - 10
-NAME_Y_OFFSET_FROM_PIC_Y = PIC_DIMS[1] + 8
+NAME_Y_OFFSET_FROM_PIC_Y = PIC_DIMS[1] + 6
 OUTPUT_DIR = 'pics/extracted'
-SHOW_IMAGES = False
+SHOW_IMAGES = True
 
 if not os.path.isdir(OUTPUT_DIR):
     os.mkdir(OUTPUT_DIR)
@@ -45,7 +45,7 @@ for fn in files:
                         x,
                         y,
                         x + PIC_DIMS[0] - SLOP,
-                        y + PIC_DIMS[1]
+                        y + PIC_DIMS[1] - SLOP
                     ))
                     if SHOW_IMAGES:
                         cropped.show()
