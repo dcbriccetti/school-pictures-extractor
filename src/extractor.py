@@ -5,15 +5,15 @@ from PIL import Image
 import pytesseract
 
 NUM_ROWS = 5
-NUM_COLS = 7
-TOP_LEFT = 100, 553
-PIC_DIMS = 180, 223
+NUM_COLS = 8
+TOP_LEFT = 190, 550
+PIC_DIMS = 149, 200
 SLOP = 5  # to avoid the border
-PIC_SPACING = 221, 310
+PIC_SPACING = 170, 312
 NAME_AREA_HEIGHT = PIC_SPACING[1] - PIC_DIMS[1] - 10
 NAME_Y_OFFSET_FROM_PIC_Y = PIC_DIMS[1] + 6
 OUTPUT_DIR = 'pics/extracted'
-SHOW_IMAGES = True
+SHOW_IMAGES = False
 
 if not os.path.isdir(OUTPUT_DIR):
     os.mkdir(OUTPUT_DIR)
