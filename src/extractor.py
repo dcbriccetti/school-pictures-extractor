@@ -4,12 +4,12 @@ import os
 from PIL import Image
 import pytesseract
 
-NUM_ROWS = 5
+NUM_ROWS = 4
 NUM_COLS = 7
-TOP_LEFT = 150, 538
+TOP_LEFT = 93, 538
 PIC_DIMS = 184, 225
 SLOP = 3  # to avoid the border
-PIC_SPACING = 202.5, 312
+PIC_SPACING = 206, 317
 NAME_AREA_HEIGHT = PIC_SPACING[1] - PIC_DIMS[1] - 10
 NAME_Y_OFFSET_FROM_PIC_Y = PIC_DIMS[1] + 8
 OUTPUT_DIR = 'pics/extracted'
